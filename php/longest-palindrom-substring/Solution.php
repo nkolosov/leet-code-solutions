@@ -20,11 +20,7 @@ class Solution
             $len = max($len1, $len2);
             if ($len > $maxLen) {
                 $maxLen = $len;
-            }
-
-            if ($len > ($end - $start)) {
-                $start = (int) ($i - floor(($len - 1) / 2));
-                $end = (int) ($i +  floor($len / 2));
+                $start = ($i - floor(($len - 1) / 2));
             }
         }
 
