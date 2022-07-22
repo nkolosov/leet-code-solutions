@@ -1,103 +1,47 @@
 <?php
 
-
 class Solution
 {
-    protected $palindromes = [];
-
-    function isPalindrom($s)
-    {
-        $len = strlen($s);
-        if (in_array(substr($s, 0, $len - 1), $this->palindromes)) {
-            return false;
-        }
-
-        if (in_array(substr($s, 1, $len - 1), $this->palindromes)) {
-            return false;
-        }
-
-        if ($this->compareSubstring($s, 0, $len)) {
-            $this->palindromes[] = $s;
-            return true;
-        }
-
-        return false;
-    }
-
-    function getIndex($i, $len)
-    {
-        if ($len == 1) {
-            return $i;
-        }
-
-        if ($len == 2) {
-            return $i + 1;
-        }
-
-        if ($len % 2 == 1) {
-            return (int)($i + ($len / 2));
-        }
-
-        return (int)($i + ceil($len / 2));
-    }
-
-    function getPartLength($len)
-    {
-        if ($len % 2 == 0) {
-            return $len / 2;
-        } else {
-            return ($len + 1) / 2;
-        }
-    }
-
-    function getLeft($s, $i, $len)
-    {
-        return substr($s, $i, $this->getPartLength($len));
-    }
-
-    function getRight($s, $i, $len)
-    {
-        return substr($s, $this->getIndex($i, $len), $this->getPartLength($len));
-    }
-
-    function compareSubstring($s, $i, $len)
-    {
-        if ($len == 1) {
-            return true;
-        }
-
-        $a = $this->getLeft($s, $i, $len);
-        $b = $this->getRight($s, $i, $len);
-
-        if ($a == strrev($b)) {
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * @param String $s
      * @return String
      */
-    function longestPalindrome($s)
+    public function longestPalindrome(string $s): string
     {
-        $l = strlen($s);
-        $maxPalindromLength = 1;
-
-        $index = 0;
-        for ($i = 0; $i <= $l - $maxPalindromLength; $i++) {
-            for ($currentPalindromLength = $maxPalindromLength; $currentPalindromLength < $l - $i + 1; $currentPalindromLength++) {
-                $str = substr($s, $i, $currentPalindromLength);
-                if ($this->isPalindrom($str)) {
-                    $index = $i;
-                    $maxPalindromLength = $currentPalindromLength;
-                }
+        if ($s == null || strlen($s) < 1) {
+            return "";
+        }
+        $start = $end = 0;
+        $maxLen = 1;
+        for ($i = 0; $i < strlen($s) - 1; $i++) {
+            list($len1, $val1) = $this->expandAroundCenter($s, $i, $i);
+            list($len2, $val2) = $this->expandAroundCenter($s, $i, $i+1);
+            $len = max($len1, $len2);
+            if ($len > $maxLen) {
+                $maxLen = $len;
             }
 
+            if ($len > ($end - $start)) {
+                $start = (int) ($i - floor(($len - 1) / 2));
+                $end = (int) ($i +  floor($len / 2));
+            }
         }
 
-        return substr($s, $index, $maxPalindromLength);
+        return substr($s, $start, $maxLen);;
     }
+
+    protected function expandAroundCenter(string $s, int $left, int $right) {
+        $L = $left;
+        $R = $right;
+
+        while ($L >= 0 && $R < strlen($s) && $s[$L] == $s[$R]) {
+            $L--;
+            $R++;
+        }
+
+        return [$R - $L - 1, substr($s, $L, $R - $L - 1)];
+    }
+
 }
 
